@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { Container, Button, Typography } from "@mui/material";
+import { Container, Button, Typography, TextField } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import Box from "@mui/material/Box";
 import Header from "../Header/Header";
@@ -15,6 +15,7 @@ import "filepond/dist/filepond.min.css";
 import { toast } from "react-toastify";
 export default function AddComplain() {
   const [editorData, setEditorData] = useState("");
+  const [title, setTitle] = useState("");
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
     clipPath: "inset(50%)",
@@ -30,39 +31,48 @@ export default function AddComplain() {
   const [checkedUser, setCheckUser] = useState(false);
   const handleSubmitComplain = async (e) => {
     e.preventDefault();
+    if (title === "" || title.trim().length > 200) {
+      toast.error("Title should be less than 200 characters and not empty.", {
+        toastId: "title_error",
+      });
+      return;
+    }
     if (editorData === "" || editorData.trim().length < 100) {
-      toast.error("Complain must be 100 characters", {
+      toast.error("Complain must be at least 100 characters", {
         toastId: "complain",
       });
       return;
     }
     const idtoken = await auth?.currentUser?.getIdToken();
     const formData = new FormData();
-    formData.append("details", editorData);
+    formData.append("title", title.trim());
+    formData.append("details", editorData.trim());
     for (let i = 0; i < files.length; i++) {
       formData.append("files", files[i]);
     }
     console.log(formData);
-
-    const response = await axios.post(
-      "http://localhost:8000/api/complain/add",
-      formData,
-      {
-        headers: {
-          accept: "application/json",
-          Authorization: `Bearer ${idtoken}`,
-          "Content-Type": "multipart/form-data",
-        },
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/complain/add",
+        formData,
+        {
+          headers: {
+            accept: "application/json",
+            Authorization: `Bearer ${idtoken}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log(response);
+      if (response.status === 201) {
+        toast.success("Complain added successfully", {
+          toastId: "complain_success",
+        });
+        setFiles([]);
+        setEditorData("");
+        setTitle("");
       }
-    );
-    console.log(response);
-    if (response.status === 201) {
-      toast.success("Complain added successfully", {
-        toastId: "complain_success",
-      });
-      setFiles([]);
-      setEditorData("");
-    } else {
+    } catch (error) {
       toast.error("Something went wrong", {
         toastId: "complain_error",
       });
@@ -78,14 +88,18 @@ export default function AddComplain() {
     checkProfile();
   });
   const checkProfile = async () => {
-    const response = await axios.get("http://localhost:8000/api/user/check", {
-      headers: {
-        Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
-      },
-    });
-    if (response?.data?.user[0]?.uid === auth.currentUser.uid) {
-      setCheckUser(true);
-    } else setCheckUser(false);
+    try {
+      const response = await axios.get("http://localhost:8000/api/user/check", {
+        headers: {
+          Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
+        },
+      });
+      if (response?.data?.user[0]?.uid === auth.currentUser.uid) {
+        setCheckUser(true);
+      } else setCheckUser(false);
+    } catch (error) {
+      setCheckUser(false);
+    }
   };
 
   return (
@@ -98,6 +112,17 @@ export default function AddComplain() {
           <p> You must be fill up your form first.</p>
         ) : (
           <form action="">
+            <Box width="100%" sx={{ marginY: 2 }}>
+              <TextField
+                required
+                id="outlined-required"
+                label="Title"
+                value={title}
+                placeholder="TItle must be with 200 characters"
+                onChange={(e) => setTitle(e.target.value)}
+                sx={{ width: "100%" }}
+              />
+            </Box>
             <CKEditor
               editor={ClassicEditor}
               config={{

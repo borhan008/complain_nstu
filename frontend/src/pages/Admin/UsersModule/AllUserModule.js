@@ -1,0 +1,182 @@
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { auth } from "../../../config";
+import { useAuth } from "../../Users/Context/AuthContext";
+import { toast } from "react-toastify";
+import {
+  IconButton,
+  Paper,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
+import Button from "@mui/material/Button";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import PeopleIcon from "@mui/icons-material/People";
+
+export default function AllUserModule() {
+  const { loading, setLoading } = useAuth();
+  const perPage = 20;
+  const [page, setPage] = useState(0);
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    setLoading(true);
+    getUsers();
+    setLoading(false);
+  }, []);
+  const getUsers = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/api/admin/users?start=${
+          page * perPage + page
+        }&end=${page * perPage + page + perPage}`,
+        {
+          headers: {
+            Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
+          },
+        }
+      );
+      setUsers(response.data.users);
+    } catch (error) {
+      toast.error("Users not found", {
+        toastId: "users",
+      });
+    }
+  };
+
+  const handleChangeRole = async (uid, role) => {
+    try {
+      const res = await axios.put(
+        "http://localhost:8000/api/admin/role",
+        {
+          role: role,
+          uid: uid,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
+          },
+        }
+      );
+      toast.success("Role changed successfully", {
+        toastId: "role",
+      });
+    } catch (error) {
+      toast.error("Role not changed", {
+        toastId: "role",
+      });
+    }
+  };
+
+  const handleUserBlock = async (uid, block) => {
+    if (block == 0) block = 1;
+    else block = 0;
+    try {
+      const res = await axios.put(
+        "http://localhost:8000/api/admin/block",
+        {
+          block: block,
+          uid: uid,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
+          },
+        }
+      );
+      toast.success(`User  ${block ? "blocked" : "unblocked"} successfully.`, {
+        toastId: "block",
+      });
+    } catch (error) {
+      toast.error(
+        `Failed! User  ${block ? "blocked" : "unblocked"} successfully.`,
+        {
+          toastId: "block",
+        }
+      );
+    }
+  };
+  return (
+    <div>
+      <Typography variant="h6" marginY={2} textAlign="left" gutterBottom>
+        Add Complain
+      </Typography>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Department</TableCell>
+
+              <TableCell>Batch</TableCell>
+              <TableCell>Role</TableCell>
+              <TableCell>Edit</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {!loading &&
+              users.map((user) => (
+                <TableRow
+                  key={user.uid}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {user.uid.substring(0, 2)}.. {user.uid.substr(-2)}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {user.name || "--"}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {user.email}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {user?.shortform || "--"}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {user?.batch || "--"}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {user.role}
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        handleChangeRole(
+                          user.uid,
+                          user.role == "user" ? "admin" : "user"
+                        );
+                      }}
+                      title={`${user.role} to ${
+                        user.role == "user" ? "admin" : "user"
+                      }`}
+                    >
+                      {user.role == "user" ? (
+                        <AdminPanelSettingsIcon />
+                      ) : (
+                        <PeopleIcon />
+                      )}
+                    </IconButton>
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    <Button
+                      onClick={() => {
+                        handleUserBlock(user.uid, user.block);
+                      }}
+                    >
+                      {user.block ? "Unblock" : "Block"}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
+  );
+}

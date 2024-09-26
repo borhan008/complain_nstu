@@ -38,7 +38,7 @@ router.post(
 
     const filename = req.files.map((file) => file.filename).join(",");
     req.body.docs = filename;
-    console.log(filename);
+    // console.log(filename);
     next();
   },
   complainController.createComplain

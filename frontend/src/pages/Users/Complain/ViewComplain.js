@@ -32,23 +32,30 @@ export default function ViewComplain() {
   const navigate = useNavigate();
 
   const fetchComplains = async () => {
-    const idtoken = await auth?.currentUser?.getIdToken();
-    const response = await fetch(
-      `http://localhost:8000/api/complain/detail/${c_id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${idtoken}`,
-        },
+    try {
+      const idtoken = await auth?.currentUser?.getIdToken();
+      const response = await fetch(
+        `http://localhost:8000/api/complain/detail/${c_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${idtoken}`,
+          },
+        }
+      );
+      if (response.status !== 200) {
+        toast.error("Complain not found", {
+          toastId: "complain",
+        });
+        navigate("/");
       }
-    );
-    if (response.status !== 200) {
+      const data = await response.json();
+      setComplains(data.complains);
+    } catch (error) {
       toast.error("Complain not found", {
         toastId: "complain",
       });
       navigate("/");
     }
-    const data = await response.json();
-    setComplains(data.complains);
   };
 
   return (
@@ -92,6 +99,15 @@ export default function ViewComplain() {
                             {complain.status}
                           </Typography>
                         </Box>
+                        {complain?.title.length > 0 && (
+                          <Typography
+                            variant="h6"
+                            fontWeight="normal"
+                            textAlign="left"
+                          >
+                            {complain.title}
+                          </Typography>
+                        )}
                         <Typography variant="body2" textAlign="left">
                           <div
                             dangerouslySetInnerHTML={{

@@ -16,6 +16,10 @@ import PublicRouter from "./pages/Users/Context/PublicRouter";
 import PrivateRouter from "./pages/Users/Context/PrivateRouter";
 import ViewComplain from "./pages/Users/Complain/ViewComplain";
 import Profile from "./pages/Users/Profile/Profile";
+import AdminRoute from "./pages/Admin/AdminRoute";
+import AdminHome from "./pages/Admin/Home/AdminHome";
+import AllUserModule from "./pages/Admin/UsersModule/AllUserModule";
+import Departments from "./pages/Admin/Deparment/Departments";
 
 function App() {
   return (
@@ -59,6 +63,30 @@ function App() {
             <PrivateRouter>
               <Profile />
             </PrivateRouter>
+          }
+        ></Route>
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminHome />
+            </AdminRoute>
+          }
+        ></Route>
+        <Route
+          path="/admin/users"
+          element={
+            <AdminRoute>
+              <AllUserModule />
+            </AdminRoute>
+          }
+        ></Route>
+        <Route
+          path="/admin/departments"
+          element={
+            <AdminRoute>
+              <Departments />
+            </AdminRoute>
           }
         ></Route>
       </Routes>

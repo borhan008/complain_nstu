@@ -1,9 +1,9 @@
 const db = require("../config/db");
 
-exports.createComplain = async ({ uid, details, docs }) => {
+exports.createComplain = async ({ uid, details, docs, title }) => {
   const [result] = await db.query(
-    "INSERT INTO complains (uid, details, docs) VALUES (?, ?, ?)",
-    [uid, details, docs]
+    "INSERT INTO complains (uid, details, docs, title) VALUES (?, ?, ?, ?)",
+    [uid, details, docs, title]
   );
   return result;
 };

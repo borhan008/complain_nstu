@@ -3,7 +3,7 @@ const mutler = require("multer");
 const path = require("path");
 
 const saveFileMiddleware = async (req, res, next) => {
-  console.log(req);
+  // console.log(req);
   req.body.details = req.details;
   if (!req.files || Object.keys(req.files).length === 0) {
     req.body.docs = null;

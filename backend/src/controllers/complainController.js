@@ -1,14 +1,14 @@
 const complainQueries = require("../queries/complainQueries");
 
 exports.createComplain = async (req, res) => {
-  const { uid } = req.user;
-  const { details, docs } = req.body;
-  console.log(details, docs);
   try {
+    const { uid } = req.user;
+    const { details, docs, title } = req.body;
     const complain = await complainQueries.createComplain({
       uid,
       details,
       docs,
+      title,
     });
     return res
       .status(201)

@@ -18,18 +18,22 @@ export default function Profile() {
   }, []);
 
   const checkProfile = async () => {
-    const idtoken = await auth?.currentUser?.getIdToken();
-    const response = await axios.get("http://localhost:8000/api/user/check", {
-      headers: {
-        Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
-      },
-    });
-    if (response?.data?.user[0]?.uid === auth.currentUser.uid) {
-      setRoll(response?.data?.user[0]?.roll);
-      setMobile(response?.data?.user[0]?.mobile);
+    try {
+      const idtoken = await auth.currentUser?.getIdToken();
+      const response = await axios.get("http://localhost:8000/api/user/check", {
+        headers: {
+          Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
+        },
+      });
+      if (response?.data?.user[0]?.uid === auth.currentUser.uid) {
+        setRoll(response?.data?.user[0]?.roll);
+        setMobile(response?.data?.user[0]?.mobile);
+      }
+    } catch (error) {
+      toast.error("Profile not found", { toastId: "profile" });
     }
   };
-  const rollReg = /^[a-zA-Z]{3}\d{7}$/;
+  const rollReg = /^[a-zA-Z]{3}\d{7}[M|F]{1}$/;
   const mobileReg = /^(\+88)?01[0-9]{9}$/;
   const handleProfile = async () => {
     if (!rollReg.test(roll) || !mobileReg.test(mobile)) {
@@ -41,23 +45,25 @@ export default function Profile() {
       );
       return;
     }
-    const res = await axios.post(
-      "http://localhost:8000/api/user/",
-      {
-        roll: roll,
-        mobile: mobile,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
+    try {
+      const res = await axios.post(
+        "http://localhost:8000/api/user/",
+        {
+          roll: roll,
+          mobile: mobile,
         },
+        {
+          headers: {
+            Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
+          },
+        }
+      );
+      if (res.status === 201 || res.status === 200) {
+        toast.success("Profile Updated Successfully", {
+          toastId: "profile_success",
+        });
       }
-    );
-    if (res.status === 201 || res.status === 200) {
-      toast.success("Profile Updated Successfully", {
-        toastId: "profile_success",
-      });
-    } else {
+    } catch (error) {
       toast.error("Profile Update Failed", {
         toastId: "profile_failed",
       });

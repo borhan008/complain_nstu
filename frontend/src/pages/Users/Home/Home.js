@@ -48,7 +48,7 @@ export default function Home() {
               Your Complains
             </Typography>
             <Grid container spacing={2}>
-              {complains.length > 0 &&
+              {complains?.length > 0 &&
                 complains.map((complain) => (
                   <Grid
                     item
@@ -84,6 +84,15 @@ export default function Home() {
                             {complain.status}
                           </Typography>
                         </Box>
+                        {complain?.title.length > 0 && (
+                          <Typography
+                            variant="h6"
+                            fontWeight="normal"
+                            textAlign="left"
+                          >
+                            {complain.title}
+                          </Typography>
+                        )}
                         <Typography variant="body2" textAlign="left">
                           {complain.details
                             .replace(/<[^>]*>?/gm, "")
