@@ -20,6 +20,8 @@ import AdminRoute from "./pages/Admin/AdminRoute";
 import AdminHome from "./pages/Admin/Home/AdminHome";
 import AllUserModule from "./pages/Admin/UsersModule/AllUserModule";
 import Departments from "./pages/Admin/Deparment/Departments";
+import AdminComplains from "./pages/Admin/Complains/AdminComplains";
+import Notifications from "./pages/Users/Notifications/Notifications";
 
 function App() {
   return (
@@ -58,6 +60,14 @@ function App() {
           }
         ></Route>
         <Route
+          path="/notifications"
+          element={
+            <PrivateRouter>
+              <Notifications />
+            </PrivateRouter>
+          }
+        ></Route>
+        <Route
           path="/profile"
           element={
             <PrivateRouter>
@@ -86,6 +96,14 @@ function App() {
           element={
             <AdminRoute>
               <Departments />
+            </AdminRoute>
+          }
+        ></Route>
+        <Route
+          path="/admin/complains"
+          element={
+            <AdminRoute>
+              <AdminComplains />
             </AdminRoute>
           }
         ></Route>

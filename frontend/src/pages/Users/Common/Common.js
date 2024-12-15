@@ -22,7 +22,7 @@ const complainStatus = (status) => {
     case "Due":
       return "gray";
     case "Approved":
-      return "success";
+      return "green";
     case "Rejected":
       return "red";
     default:

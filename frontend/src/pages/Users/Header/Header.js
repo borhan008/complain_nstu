@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -17,12 +17,36 @@ import { Link } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { toast } from "react-toastify";
 import { auth } from "../../../config";
+import axios from "axios";
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const [notificationsCount, setNotificationsCount] = React.useState(0);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const idtoken = await auth?.currentUser?.getIdToken();
+        const response = await axios.get(
+          "http://localhost:8000/api/user/notifications/count",
+          {
+            headers: {
+              Authorization: `Bearer ${idtoken}`,
+            },
+          }
+        );
+        setNotificationsCount(response.data.count);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    const intervalId = setInterval(fetchNotifications, 5000);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -101,21 +125,14 @@ export default function Header() {
         </IconButton>
         <p>Add Complain</p>
       </MenuItem>
-      <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
+
+      <MenuItem component={Link} to="/notifications">
         <IconButton
           size="large"
-          aria-label="show 17 new notifications"
+          aria-label={`show ${notificationsCount} new notifications`}
           color="inherit"
         >
-          <Badge badgeContent={17} color="error">
+          <Badge badgeContent={notificationsCount} color="error">
             <NotificationsIcon />
           </Badge>
         </IconButton>
@@ -165,21 +182,15 @@ export default function Header() {
               >
                 <PostAddIcon />
               </IconButton>
+
               <IconButton
                 size="large"
-                aria-label="show 4 new mails"
+                aria-label={`show ${notificationsCount} new notifications`}
                 color="inherit"
+                component={Link}
+                to="/notifications"
               >
-                <Badge badgeContent={4} color="error">
-                  <MailIcon />
-                </Badge>
-              </IconButton>
-              <IconButton
-                size="large"
-                aria-label="show 17 new notifications"
-                color="inherit"
-              >
-                <Badge badgeContent={17} color="error">
+                <Badge badgeContent={notificationsCount} color="error">
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
