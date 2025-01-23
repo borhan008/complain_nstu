@@ -5,6 +5,7 @@ import { auth } from "../../../config";
 import SendIcon from "@mui/icons-material/Send";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Helmet } from "react-helmet";
 
 export default function Profile() {
   const [loading, setLoading] = useState(true);
@@ -71,6 +72,9 @@ export default function Profile() {
   };
   return (
     <>
+      <Helmet>
+        <title>Profile | Complain NSTU</title>
+      </Helmet>
       {loading ? (
         <Loading />
       ) : (

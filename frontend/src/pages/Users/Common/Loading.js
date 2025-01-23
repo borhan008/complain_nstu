@@ -2,9 +2,13 @@ import React from "react";
 import LinearProgress from "@mui/material/LinearProgress";
 import { Box, Typography } from "@mui/material";
 import nstulogo from "../../images/logo.png";
+import { Helmet } from "react-helmet";
 const Loading = () => {
   return (
     <>
+      <Helmet>
+        <title>Loading | Complain NSTU</title>
+      </Helmet>
       <LinearProgress />
       <Box
         display="flex"

@@ -7,6 +7,7 @@ import SendIcon from "@mui/icons-material/Send";
 import Box from "@mui/material/Box";
 import Header from "../Header/Header";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 export default function Notifications() {
   const [notifications, setNotifications] = React.useState([]);
   useEffect(() => {
@@ -41,6 +42,9 @@ export default function Notifications() {
 
   return (
     <>
+      <Helmet>
+        <title>Notifications | Complain NSTU</title>
+      </Helmet>
       <Container maxWidth="md" sx={{ marginBottom: 2, textAlign: "left" }}>
         <Typography variant="h6" marginY={2} textAlign="left" gutterBottom>
           Notifications

@@ -36,6 +36,7 @@ import Slide from "@mui/material/Slide";
 import EditIcon from "@mui/icons-material/Edit";
 import { Delete } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -56,6 +57,13 @@ const AdminComplains = () => {
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState([]);
 
+  const [departmentList, setDepartmentList] = useState([]);
+  const [filtering, setFiltering] = useState({
+    department: "All",
+    batch: "",
+    roll: "",
+  });
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -66,13 +74,68 @@ const AdminComplains = () => {
 
   useEffect(() => {
     setLoading(true);
-    console.log(page);
+    const fetchDepartments = async () => {
+      axios
+        .get(`${backendUrl}/admin/department`, {
+          headers: {
+            Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
+          },
+        })
+        .then((response) => {
+          setDepartmentList(response.data.departments);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
+    fetchDepartments();
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    setPage(1); // Reset page to 1
+    setTotalPages(0);
+    console.log(filtering);
     const fetchComplains = async () => {
       axios
         .get(
           `${backendUrl}/admin/complains?page=${
             page - 1
-          }&limit=${itemsPerPage}`,
+          }&limit=${itemsPerPage}&department=${filtering.department}&batch=${
+            filtering.batch
+          }&roll=${filtering.roll}`,
+          {
+            headers: {
+              Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response.data.complains[0]);
+          setData(response.data.complains[0]);
+          setTotalPages(Math.ceil(response.data.count / itemsPerPage));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
+    fetchComplains();
+    setLoading(false);
+  }, [filtering]);
+
+  useEffect(() => {
+    setLoading(true);
+    console.log(page);
+    setData([]);
+    const fetchComplains = async () => {
+      axios
+        .get(
+          `${backendUrl}/admin/complains?page=${
+            page - 1
+          }&limit=${itemsPerPage}&department=${filtering.department}&batch=${
+            filtering.batch
+          }`,
           {
             headers: {
               Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
@@ -215,9 +278,77 @@ const AdminComplains = () => {
 
   return (
     <div>
+      <Helmet>
+        <title>Complaints | Admin Panel | Complain NSTU</title>
+      </Helmet>
       <Typography variant="h6" marginY={2} textAlign="left" gutterBottom>
-        Complains
+        Complaints
       </Typography>
+
+      <Box
+        sx={{
+          display: ["block", "block", "flex"],
+          justifyContent: "space-between",
+        }}
+      >
+        <Box sx={{ display: "flex" }}>
+          <Box
+            sx={{
+              marginRight: 2,
+            }}
+          >
+            <InputLabel id="roll-select-label">Roll</InputLabel>
+            <TextField
+              id="outlined-basic"
+              size="small"
+              value={filtering.roll}
+              onChange={(e) => {
+                setFiltering({ ...filtering, roll: e.target.value });
+              }}
+            />
+          </Box>
+          <div>
+            <InputLabel id="batch-select-label">Batch</InputLabel>
+
+            <TextField
+              id="outlined-basic"
+              labelId="batch-select-label"
+              size="small"
+              value={filtering.batch}
+              onChange={(e) => {
+                setFiltering({ ...filtering, batch: e.target.value });
+              }}
+            />
+          </div>
+        </Box>
+        <Box
+          sx={{
+            maxWidth: "220px",
+          }}
+        >
+          <InputLabel id="dept-select-label">Department</InputLabel>
+          <Select
+            labelId="dept-select-label"
+            value={filtering.department}
+            onChange={(e) => {
+              setFiltering({ ...filtering, department: e.target.value });
+            }}
+            fullWidth
+            variant="outlined"
+            size="small"
+            label="Department"
+            sx={{ minWidth: "150px" }}
+          >
+            <MenuItem value="All">All Departments</MenuItem>
+            {departmentList.map((department) => (
+              <MenuItem value={department.d_id} key={department.shortform}>
+                {department.shortform}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+      </Box>
+
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
           <TableHead>
@@ -228,8 +359,7 @@ const AdminComplains = () => {
               <TableCell>Date</TableCell>
 
               <TableCell>Status</TableCell>
-
-              <TableCell>To</TableCell>
+              <TableCell>Edit</TableCell>
               <TableCell>Delete</TableCell>
             </TableRow>
           </TableHead>
@@ -256,15 +386,12 @@ const AdminComplains = () => {
                     }
                   )}
                 </TableCell>
+                <TableCell>{row.status}</TableCell>
                 <TableCell>
-                  {row.status}
-
                   <IconButton onClick={() => handleOpenDialog(row)}>
                     <EditIcon />
                   </IconButton>
                 </TableCell>
-                <TableCell></TableCell>
-
                 <TableCell>
                   <IconButton
                     onClick={async () => {

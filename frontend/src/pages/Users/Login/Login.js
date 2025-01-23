@@ -17,6 +17,7 @@ import { auth, googleProvider } from "../../../config";
 import { signInWithPopup } from "firebase/auth";
 import { toast } from "react-toastify";
 import { Navigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -90,6 +91,9 @@ export default function Login() {
   };
   return (
     <div>
+      <Helmet>
+        <title>Login | Complain NSTU</title>
+      </Helmet>
       <Box
         display="flex"
         flex="1"

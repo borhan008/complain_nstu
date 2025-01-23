@@ -22,10 +22,14 @@ import AllUserModule from "./pages/Admin/UsersModule/AllUserModule";
 import Departments from "./pages/Admin/Deparment/Departments";
 import AdminComplains from "./pages/Admin/Complains/AdminComplains";
 import Notifications from "./pages/Users/Notifications/Notifications";
+import { Helmet } from "react-helmet";
 
 function App() {
   return (
     <AuthProvider>
+      <Helmet>
+        <title>Home | Complain NSTU</title>
+      </Helmet>
       <Routes>
         <Route
           path="/login"

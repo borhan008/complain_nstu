@@ -18,6 +18,7 @@ import {
 import Button from "@mui/material/Button";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import PeopleIcon from "@mui/icons-material/People";
+import { Helmet } from "react-helmet";
 
 export default function AllUserModule() {
   const { loading, setLoading } = useAuth();
@@ -103,8 +104,11 @@ export default function AllUserModule() {
   };
   return (
     <div>
+      <Helmet>
+        <title>Users | Admin Panel | Complain NSTU</title>
+      </Helmet>
       <Typography variant="h6" marginY={2} textAlign="left" gutterBottom>
-        Add Complain
+        Users
       </Typography>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
@@ -127,7 +131,7 @@ export default function AllUserModule() {
                   key={user.uid}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
-                  <TableCell component="th" scope="row">
+                  <TableCell component="th" scope="row" title={user.uid}>
                     {user.uid.substring(0, 2)}.. {user.uid.substr(-2)}
                   </TableCell>
                   <TableCell component="th" scope="row">

@@ -27,6 +27,7 @@ import SendIcon from "@mui/icons-material/Send";
 import Slide from "@mui/material/Slide";
 import EditIcon from "@mui/icons-material/Edit";
 import { Delete } from "@mui/icons-material";
+import { Helmet } from "react-helmet";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -206,6 +207,9 @@ export default function Departments() {
   };
   return (
     <div>
+      <Helmet>
+        <title>Departments | Admin Panel | Complain NSTU</title>
+      </Helmet>
       <Typography variant="h6" marginY={2} textAlign="left" gutterBottom>
         Departments
       </Typography>

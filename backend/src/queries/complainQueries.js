@@ -67,13 +67,44 @@ exports.addUserComment = async ({ c_id, uid, comment }) => {
 };
 
 //Admin
+exports.getComplainsWithPagination = async ({
+  page,
+  limit,
+  department,
+  batch,
+  roll,
+}) => {
+  let query = `
+    SELECT * 
+    FROM complains as C 
+    JOIN users as U ON C.uid = U.uid 
+    JOIN departments as D ON D.d_id = U.d_id
+  `;
+  let params = [];
+  let conditions = [];
 
-exports.getComplainsWithPagination = async ({ page, limit }) => {
-  const result = await db.query(
-    "SELECT * FROM complains as C join users as U join departments as D  on C.uid=U.uid and D.d_id = U.d_id  ORDER BY c_id DESC LIMIT ? , ?",
-    [limit * page, limit]
-  );
+  if (department && department !== "") {
+    conditions.push("D.d_id = ?");
+    params.push(department);
+  }
 
+  if (batch && batch !== "") {
+    conditions.push("U.batch = ?");
+    params.push(batch);
+  }
+  if (roll && roll !== "") {
+    console.log(roll);
+    conditions.push("U.roll = ?");
+    params.push(roll);
+  }
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
+  }
+
+  query += " ORDER BY c_id DESC LIMIT ?, ?";
+  params.push(limit * page, limit);
+
+  const result = await db.query(query, params);
   return result;
 };
 

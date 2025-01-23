@@ -16,6 +16,12 @@ import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import { Link } from "react-router-dom";
+import GroupIcon from "@mui/icons-material/Group";
+import SchoolIcon from "@mui/icons-material/School";
+import MarkAsUnreadIcon from "@mui/icons-material/MarkAsUnread";
+import HomeIcon from "@mui/icons-material/Home";
+import { Helmet } from "react-helmet";
 
 const drawerWidth = 240;
 
@@ -38,113 +44,147 @@ function AdminInterface({ children }) {
     }
   };
 
+  const menus = [
+    {
+      title: "Users",
+      icon: <GroupIcon />,
+      link: "/admin/users",
+    },
+    {
+      title: "Departments",
+      icon: <SchoolIcon />,
+      link: "/admin/departments",
+    },
+    {
+      title: "Complains",
+      icon: <MarkAsUnreadIcon />,
+      link: "/admin/complains",
+    },
+  ];
+
   const drawer = (
     <div>
       <Toolbar />
       <Divider />
       <List>
-        {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-          <ListItem key={text} disablePadding>
+        {menus.map((menu) => (
+          <ListItem
+            style={{
+              color: "black",
+            }}
+            disablePadding
+            component={Link}
+            to={menu.link}
+            key={menu.title}
+          >
             <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
+              <ListItemIcon>{menu.icon}</ListItemIcon>
+              <ListItemText primary={menu.title} />
             </ListItemButton>
           </ListItem>
         ))}
       </List>
       <Divider />
       <List>
-        {["All mail", "Trash", "Spam"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
+        <ListItem
+          style={{
+            color: "black",
+          }}
+          disablePadding
+          component={Link}
+          to={"/"}
+        >
+          <ListItemButton>
+            <ListItemIcon>
+              <HomeIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Home"} />
+          </ListItemButton>
+        </ListItem>
       </List>
     </div>
   );
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-        }}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: "none" } }}
+    <>
+      <Helmet>
+        <title>Admin Panel | Complain NSTU</title>
+      </Helmet>
+
+      <Box sx={{ display: "flex" }}>
+        <CssBaseline />
+        <AppBar
+          position="fixed"
+          sx={{
+            width: { sm: `calc(100% - ${drawerWidth}px)` },
+            ml: { sm: `${drawerWidth}px` },
+          }}
+        >
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { sm: "none" } }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" noWrap component="div">
+              Admin Panel
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Box
+          component="nav"
+          sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+          aria-label="mailbox folders"
+        >
+          <Drawer
+            variant="temporary"
+            open={mobileOpen}
+            onTransitionEnd={handleDrawerTransitionEnd}
+            onClose={handleDrawerClose}
+            ModalProps={{
+              keepMounted: true, // Better open performance on mobile.
+            }}
+            sx={{
+              display: { xs: "block", sm: "none" },
+              "& .MuiDrawer-paper": {
+                boxSizing: "border-box",
+                width: drawerWidth,
+              },
+            }}
           >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Admin Panel
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Box
-        component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="mailbox folders"
-      >
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onTransitionEnd={handleDrawerTransitionEnd}
-          onClose={handleDrawerClose}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
+            {drawer}
+          </Drawer>
+          <Drawer
+            variant="permanent"
+            sx={{
+              display: { xs: "none", sm: "block" },
+              "& .MuiDrawer-paper": {
+                boxSizing: "border-box",
+                width: drawerWidth,
+              },
+            }}
+            open
+          >
+            {drawer}
+          </Drawer>
+        </Box>
+        <Box
+          component="main"
           sx={{
-            display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-            },
+            flexGrow: 1,
+            p: 3,
+            width: { sm: `calc(100% - ${drawerWidth}px)` },
           }}
         >
-          {drawer}
-        </Drawer>
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: "none", sm: "block" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-            },
-          }}
-          open
-        >
-          {drawer}
-        </Drawer>
+          <Toolbar />
+          {children}
+        </Box>
       </Box>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-        }}
-      >
-        <Toolbar />
-        {children}
-      </Box>
-    </Box>
+    </>
   );
 }
 

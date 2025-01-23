@@ -113,14 +113,19 @@ exports.getComplainsWithPagination = async (req, res) => {
     if (req.user.role !== "admin") {
       return res.status(403).json({ message: "Forbidden" });
     }
-    let { page, limit } = req.query;
+    let { page, limit, department, batch, roll } = req.query;
+    console.log(department, batch);
     page = parseInt(page);
     limit = parseInt(limit);
     console.log(page, limit);
+    if (department == "All") department = "";
     const countComplains = await complainQueries.countComplains();
     const complains = await complainQueries.getComplainsWithPagination({
       page,
       limit,
+      department,
+      batch,
+      roll,
     });
     return res.status(200).json({ complains, count: countComplains });
   } catch (err) {

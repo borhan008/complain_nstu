@@ -19,6 +19,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Dangerous } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { Helmet } from "react-helmet";
 
 export default function ViewComplain() {
   const [complains, setComplains] = useState([]);
@@ -137,9 +138,12 @@ export default function ViewComplain() {
         <Loading />
       ) : (
         <>
+          <Helmet>
+            <title>Complaint | Complain NSTU</title>
+          </Helmet>
           <Container maxWidth="md" sx={{ marginBottom: 2 }}>
             <Typography variant="h6" marginY={2} textAlign="left" gutterBottom>
-              Complain Details
+              Complaint Details
             </Typography>
             <Grid container spacing={2}>
               {complains?.length > 0 &&

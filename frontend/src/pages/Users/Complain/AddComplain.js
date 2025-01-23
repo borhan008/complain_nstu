@@ -13,6 +13,7 @@ import { FilePond, registerPlugin } from "react-filepond";
 
 import "filepond/dist/filepond.min.css";
 import { toast } from "react-toastify";
+import { Helmet } from "react-helmet";
 export default function AddComplain() {
   const [editorData, setEditorData] = useState("");
   const [title, setTitle] = useState("");
@@ -104,9 +105,12 @@ export default function AddComplain() {
 
   return (
     <>
+      <Helmet>
+        <title>Add Complaint | Complain NSTU</title>
+      </Helmet>
       <Container maxWidth="md" sx={{ marginBottom: 2, textAlign: "left" }}>
         <Typography variant="h6" marginY={2} textAlign="left" gutterBottom>
-          Add Complain
+          Add Complaint
         </Typography>
         {checkedUser === false ? (
           <p> You must be fill up your form first.</p>
