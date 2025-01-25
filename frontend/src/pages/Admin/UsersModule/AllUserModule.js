@@ -14,6 +14,8 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Box,
+  Pagination,
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
@@ -23,19 +25,43 @@ import { Helmet } from "react-helmet";
 export default function AllUserModule() {
   const { loading, setLoading } = useAuth();
   const perPage = 20;
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [users, setUsers] = useState([]);
   useEffect(() => {
     setLoading(true);
-    getUsers();
+
+    const getTotalUsers = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/admin/countusers`,
+          {
+            headers: {
+              Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
+            },
+          }
+        );
+        setTotalPages(response.data.result[0].count);
+      } catch (error) {
+        toast.error("Users not found", {
+          toastId: "users",
+        });
+      }
+    };
+    getTotalUsers();
     setLoading(false);
   }, []);
+
+  useEffect(() => {
+    getUsers();
+  }, [page]);
+
   const getUsers = async () => {
     try {
       const response = await axios.get(
         `http://localhost:8000/api/admin/users?start=${
-          page * perPage + page
-        }&end=${page * perPage + page + perPage}`,
+          (page - 1) * perPage
+        }&end=${page * perPage - 1}`,
         {
           headers: {
             Authorization: `Bearer ${await auth?.currentUser?.getIdToken()}`,
@@ -108,7 +134,7 @@ export default function AllUserModule() {
         <title>Users | Admin Panel | Complain NSTU</title>
       </Helmet>
       <Typography variant="h6" marginY={2} textAlign="left" gutterBottom>
-        Users
+        Users ({totalPages})
       </Typography>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
@@ -181,6 +207,14 @@ export default function AllUserModule() {
           </TableBody>
         </Table>
       </TableContainer>
+      <Box sx={{ display: "flex", justifyContent: "center", marginTop: 2 }}>
+        <Pagination
+          count={totalPages}
+          page={page}
+          color="primary"
+          onChange={(e, value) => setPage(value)}
+        />
+      </Box>
     </div>
   );
 }

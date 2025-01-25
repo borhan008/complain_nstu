@@ -30,6 +30,12 @@ exports.createUser = async ({
   }
 };
 
+exports.countUsers = async () => {
+  const [result] = await db.query("SELECT COUNT(*) as count FROM users");
+
+  return result;
+};
+
 exports.checkUser = async (uid) => {
   const [result] = await db.query(
     "SELECT uid, roll, mobile, role, block FROM users WHERE uid = ?",

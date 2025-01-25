@@ -101,3 +101,12 @@ exports.blockUser = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error });
   }
 };
+
+exports.countUsers = async (req, res) => {
+  try {
+    const result = await userQueries.countUsers();
+    res.status(200).json({ result });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};

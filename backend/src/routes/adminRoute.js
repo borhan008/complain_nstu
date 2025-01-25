@@ -7,7 +7,7 @@ const complainController = require("../controllers/complainController");
 router.get("/users", userController.showUserWithLimitRange);
 router.put("/role", userController.changeRole);
 router.put("/block", userController.blockUser);
-
+router.get("/countusers", userController.countUsers);
 router.use("/department/", deptRoute);
 router.get("/complains", complainController.getComplainsWithPagination);
 router.put("/complain/status", complainController.updateStatus);
