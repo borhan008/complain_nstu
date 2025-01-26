@@ -28,6 +28,7 @@ export default function AllUserModule() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [users, setUsers] = useState([]);
+  const [totalUsers, setTotalUsers] = useState(0);
   useEffect(() => {
     setLoading(true);
 
@@ -41,7 +42,8 @@ export default function AllUserModule() {
             },
           }
         );
-        setTotalPages(response.data.result[0].count);
+        setTotalPages(Math.ceil(response.data.result[0].count / perPage));
+        setTotalUsers(response.data.result[0].count);
       } catch (error) {
         toast.error("Users not found", {
           toastId: "users",
@@ -134,7 +136,7 @@ export default function AllUserModule() {
         <title>Users | Admin Panel | Complain NSTU</title>
       </Helmet>
       <Typography variant="h6" marginY={2} textAlign="left" gutterBottom>
-        Users ({totalPages})
+        Users ({totalUsers})
       </Typography>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">

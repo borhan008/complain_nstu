@@ -22,6 +22,10 @@ import SchoolIcon from "@mui/icons-material/School";
 import MarkAsUnreadIcon from "@mui/icons-material/MarkAsUnread";
 import HomeIcon from "@mui/icons-material/Home";
 import { Helmet } from "react-helmet";
+import { signOut } from "firebase/auth";
+import { toast } from "react-toastify";
+import { auth } from "../../../config";
+import { LogoDevOutlined, Logout } from "@mui/icons-material";
 
 const drawerWidth = 240;
 
@@ -42,6 +46,20 @@ function AdminInterface({ children }) {
     if (!isClosing) {
       setMobileOpen(!mobileOpen);
     }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth)
+      .then(() => {
+        toast.success("Logout Successfully", {
+          toastId: "logout",
+        });
+      })
+      .catch((error) => {
+        toast.error("Logout Failed", {
+          toastId: "logout_fail",
+        });
+      });
   };
 
   const menus = [
@@ -92,13 +110,27 @@ function AdminInterface({ children }) {
           }}
           disablePadding
           component={Link}
-          to={"/"}
+          to={"/admin"}
         >
           <ListItemButton>
             <ListItemIcon>
               <HomeIcon />
             </ListItemIcon>
             <ListItemText primary={"Home"} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem
+          style={{
+            color: "black",
+          }}
+          disablePadding
+          onClick={handleLogout}
+        >
+          <ListItemButton>
+            <ListItemIcon>
+              <Logout />
+            </ListItemIcon>
+            <ListItemText primary={"Logout"} />
           </ListItemButton>
         </ListItem>
       </List>
