@@ -118,9 +118,18 @@ export default function AllUserModule() {
           },
         }
       );
-      toast.success(`User  ${block ? "blocked" : "unblocked"} successfully.`, {
-        toastId: "block",
-      });
+
+      setUsers((prev) =>
+        prev.map((user) => {
+          if (user.uid === uid) {
+            return { ...user, block: block };
+          } else {
+            return user;
+          }
+        })
+      );
+
+      toast.success(`User  ${block ? "blocked" : "unblocked"} successfully.`);
     } catch (error) {
       toast.error(
         `Failed! User  ${block ? "blocked" : "unblocked"} successfully.`,
